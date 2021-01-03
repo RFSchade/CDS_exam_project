@@ -23,7 +23,7 @@ The goal is for these plots to be:
 
 ## Setup
 
-Though the data has been cleaned (see *\'Data_cleaning_markdown.Rmd\'*), I will need help from the *\'tidiverse\'* package to manipulate it into a shape more beneficient to visialisation, as well as plotting the data. 
+Though the data has been cleaned (see [Data_cleaning_markdown.Rmd](https://github.com/RFSchade/CDS_exam_project/blob/main/Data_cleaning_markdown.Rmd)), I will need help from the *\'tidiverse\'* package to manipulate it into a shape more beneficient to visialisation, as well as plotting the data. 
 
 ```{r Calling package, message=FALSE, warning=FALSE}
 # calling the tidyverse package

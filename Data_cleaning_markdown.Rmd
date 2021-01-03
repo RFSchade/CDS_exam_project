@@ -59,7 +59,7 @@ to_remove <- c("s_1", "email", "stato_1", "stato_2", "stato_3", "stato_5")
 modified_data <- modified_data[, !(names(modified_data) %in% to_remove)]
 ```
 
-Now it is time to rename the remaining columns - See the READ ME file of this project for proper documentation of the new variable names. 
+Now it is time to rename the remaining columns - See [the survey datapackage](https://github.com/RFSchade/CDS_exam_project/blob/main/Datapackage_survey.json) for proper documentation of the new variable names. 
 
 ```{r Renaming Columns}
 # Renaming the remaining columns 
@@ -93,7 +93,7 @@ colnames(modified_data) <- c("age",
 
 ## Changing Labels Within the Data
 
-Now that the names of the columns have become more informative, it becomes clear that labels of the categorical data within them are not. As such, I will change those as well. (for more through documentation of these labels, I once again direct you to the READ ME file)  
+Now that the names of the columns have become more informative, it becomes clear that labels of the categorical data within them are not. As such, I will change those as well. (for more through documentation of these labels, see: [the survey datapackage](https://github.com/RFSchade/CDS_exam_project/blob/main/Datapackage_survey.json))  
 
 In the survey, the questions that specifies the categorical data has text options (though these categories in the current data are represented by numbers) - I will name the labels after those. To do this, I turn the variables from characters into a factors and label the levels. 
 
