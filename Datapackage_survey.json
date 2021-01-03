@@ -179,7 +179,7 @@
       "path": "https://opensource.org/licenses/MIT"
     }
   ],
-  "name": "Survey_data_package",
+  "name": "survey_data_package",
   "title": "Survey on open data at Aarhus University",
   "description": "Cleaned data from a small survey of data sharing attitudes and practices at Aarhus University, Denmark",
   "homepage": "https://github.com/RFSchade/CDS_exam_project",
