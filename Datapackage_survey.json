@@ -1,0 +1,193 @@
+{
+  "profile": "tabular-data-package",
+  "resources": [
+    {
+      "name": "full_survey_dataset",
+      "path": "https://github.com/RFSchade/CDS_exam_project/blob/main/data/full_dataset.csv",
+      "profile": "tabular-data-resource",
+      "schema": {
+        "fields": [
+          {
+            "name": "age",
+            "type": "integer",
+            "format": "default",
+            "title": "Age of participants",
+            "description": "The answer to the question,  \"How old are you?\" "
+          },
+          {
+            "name": "gender",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"Gender:\"\nthe question had four answer categories:\n\"Male\", \"Female\", \"Other\", \"Prefer not to say\"",
+            "title": "Gender of participants"
+          },
+          {
+            "name": "position",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"I currently self-identify as…\"\nThe question had six answer categories:\n\"Academic\", \"Archevist\", \"Independent Scholar\", \"Librarian\", \"PhD researcher\", \"Student\"",
+            "title": "Academic positions "
+          },
+          {
+            "name": "years_experience",
+            "type": "integer",
+            "format": "default",
+            "description": "The answer to the question, \"How many years of experience do you have in your current position?\"",
+            "title": "Experience in position"
+          },
+          {
+            "name": "field",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"What is your academic field?\"",
+            "title": "Academic field"
+          },
+          {
+            "name": "familiarity",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"Are you familiar with the term ‘Open data’?\"\nThe question had two answer categories: \"Yes\" and \"No\"",
+            "title": "Familiarity with open data"
+          },
+          {
+            "name": "familiarity_scource",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"If you are, where do you know it from?\"",
+            "title": "Scource of familiarity"
+          },
+          {
+            "name": "importance",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"Using the definition above, how important do you believe creating and using open data is for research today?\"\nThe 'definition' refers to \"(...)data that can be freely used, shared and built-on by anyone, anywhere, for any purpose.\" (Laura James 2016, link: https://blog.okfn.org/2013/10/03/defining-open-data/)\nThe question had five answer categories: \"Not important\", \"Slightly important\", \"Neutral\", \"Important\", \"Very important\"",
+            "title": "Importance of open data"
+          },
+          {
+            "name": "definition_comment",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"Is your definition of open data different from the one used above? If it is, how so?\"\nThe 'definition' refers to \"(...)data that can be freely used, shared and built-on by anyone, anywhere, for any purpose.\" (Laura James 2016, link: https://blog.okfn.org/2013/10/03/defining-open-data/)",
+            "title": "Comment on a definition of open data"
+          },
+          {
+            "name": "share_after_pub",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"Do you believe it is important in your field to share data after publication?\"\nThe question had two answer categories: \"Yes\" and \"No\"",
+            "title": "Importance of data sharing after publication"
+          },
+          {
+            "name": "share_after_pub_comment",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"Write the reason for your answer\"\nThis question refers to the previous question (see: Importance of data sharing after publication)",
+            "title": "commpent on the importance of sharing data after publication"
+          },
+          {
+            "name": "share_after_pub_freq",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"In the last 24 months, how often have you shared your data after publication?\"\nThe question had 5 answer categories: \"Always\", \"Often\", \"Sometimes\", \"Rarely\", \"Never\"",
+            "title": "Frequency of sharing data after publication"
+          },
+          {
+            "name": "share_pre_pub",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"Do you believe it is important in your field to share data before publication?\"\nThe question had two answer categories: \"Yes\" and \"No\"",
+            "title": "Importance of sharing data before publication"
+          },
+          {
+            "name": "share_pre_pub_comment",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"Write the reason for your answer\"\nThis question refers to the previous question (see: Importance of data sharing before publication)",
+            "title": "Comment on the importance of sharing data before publication"
+          },
+          {
+            "name": "share_pre_pub_freq",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"In the last 24 months, how often have you shared your data before publication?\"\nThe question had 5 answer categories: \"Always\", \"Often\", \"Sometimes\", \"Rarely\", \"Never\"\n",
+            "title": "Frequency of sharing data after publication"
+          },
+          {
+            "name": "public_data_freq",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"In the last 24 months, how often have you made the data and/or data analysis scripts of your research projects public?\n(ie. shared them in a data-base or online repository, as opposed to sharing the data only when asked)\"\nThe question had 5 answer categories: \"Always\", \"Often\", \"Sometimes\", \"Rarely\", \"Never\"\n",
+            "title": "Frequency of making data public"
+          },
+          {
+            "name": "public_data_how",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"How are the data/scripts shared?\"\nThis question refers to the previous question (see: Frequency of making data public)",
+            "title": "How is the data public"
+          },
+          {
+            "name": "student_graded",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"(For students) Are you graded in your subjects for adherence to open science principles?\"\nThe question had three answer categories: \"Yes\", \"No\", \"Not relevant for me\"",
+            "title": "Open data grading (students)"
+          },
+          {
+            "name": "teacher_graded",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"(For teachers) Do you grade your students for adherence to open science principles?\"\nThe question had three answer categories: \"Yes\", \"No\", \"Not relevant for me\"\n",
+            "title": "Open data grading (teachers)"
+          },
+          {
+            "name": "other_data_use",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"In the past 24 months, how often have you used other people’s data for your own research? (Class work included)\"\nThe question had 5 answer categories: \"Always\", \"Often\", \"Sometimes\", \"Rarely\", \"Never\"\n\n",
+            "title": "Use of other peoples' data"
+          },
+          {
+            "name": "other_data_experience",
+            "type": "string",
+            "format": "default",
+            "description": "The answer to the question, \"If you have, what was your experience?\"\nThis question refers to the previous question (see: Use of other peoples' data)",
+            "title": "Experience with using other peoples' data"
+          },
+          {
+            "name": "status",
+            "type": "string",
+            "format": "default",
+            "title": "Status",
+            "description": "Variable indicating the completion status of the survey. The variable has two lables\n\"complete\" = participant clicked 'submit' on the last page of the survey.\n\"incomplete\" = participant quit survey prior to doing so. \n"
+          }
+        ]
+      },
+      "title": "Data sharing survey",
+      "format": "csv"
+    }
+  ],
+  "keywords": [
+    "Open data",
+    "Survey",
+    "Open science",
+    "Exam project"
+  ],
+  "licenses": [
+    {
+      "title": "MIT",
+      "path": "https://opensource.org/licenses/MIT"
+    }
+  ],
+  "name": "Survey_data_package",
+  "title": "Survey on open data at Aarhus University",
+  "description": "Cleaned data from a small survey of data sharing attitudes and practices at Aarhus University, Denmark",
+  "homepage": "https://github.com/RFSchade/CDS_exam_project",
+  "version": "1.0.0",
+  "contributors": [
+    {
+      "title": "Rebecca Folmer Schade ",
+      "role": "author"
+    }
+  ]
+}
