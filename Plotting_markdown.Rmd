@@ -1,0 +1,335 @@
+---
+title: "Plotting"
+author: "Rebecca Folmer Schade"
+date: "27 dec 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# I'll set the working directory here as well
+require("knitr")
+opts_knit$set(root.dir = "~/Uni/Cultural_data_science/Exam/Open_data_project")
+```
+
+The purpose of this project is to illustrate and shed further light on the intricacies of why open data is still lacking in scientific research, despite much time spendt as a hot topic in the debate on a chaning scintific process.  
+
+To do this, I will attempt to plot data I have collected from a small survey of data sharing practices at Aarhus University, Denmark (though the data I have collected so far is not suficient for a statistical analysis). 
+
+The goal is for these plots to be:  
+- easily readable  
+- informative  
+- comparable to each-other
+
+## Setup
+
+Though the data has been cleaned (see *\'Data_cleaning_markdown.Rmd\'*), I will need help from the *\'tidiverse\'* package to manipulate it into a shape more beneficient to visialisation, as well as plotting the data. 
+
+```{r Calling package, message=FALSE, warning=FALSE}
+# calling the tidyverse package
+library(tidyverse)
+```
+
+The cleaned dataset can be found within the *\'data\'* folder of this project.
+Its file name is *\'clean_dataset.csv\'*, and I load it into an object (of the class *\'tibble\'*) called *\'aarhus_survey\'* below.
+
+```{r Loading data, message=FALSE, warning=FALSE}
+# Loading clean dataset
+aarhus_survey <- read_csv("data/clean_dataset.csv")
+```
+
+
+## Defining a theme and color scheme
+
+First I want to define some commonalieties between the plots. I intend to do this using a custom *\'ggplot\'* theme and colorscheme. 
+
+```{r Theme, echo=FALSE}
+# Creating a GGplot theme using 'theme_minimal' as a basis
+showcase_theme <- theme_minimal() + 
+  theme(panel.grid.minor = element_blank()) + # Removing the minor background grid
+  theme(panel.grid.major.y = element_blank()) + # Removing part of the major background grid
+  theme(panel.grid.major.x = element_line(colour = "#989898")) + # changing the color of the remaining grid
+  theme(aspect.ratio = 1/5) + # Changing the aspect ratio between the x and y axis
+  theme(legend.position = "top") + # Moving the legend to the top of the plot 
+  theme(legend.title = element_blank()) + # Removing the legend title
+  theme(legend.text = element_text(size = 8)) + # Changing the size of the legend text
+  theme(legend.key.width = unit(2, "cm")) + # standardizing the length of the legend keys
+  theme(plot.title = element_text(hjust = 0.5)) # adjusting the position of the tilt of the plot
+
+# Defining a list of colors for likert scale plots
+likert_palette <- c("#0965C5", "#99CAF3", "#BFCBD5", "#F5B09E", "#B13311")
+
+# Defining a list of colors for plots with a binary answer key 
+binary_palette <- c("#0965C5", "#B13311")
+```
+
+## Manipulating data
+
+The data in *\'aarhus_survey\'*, while clean, is not in the right format for plotting. In this section, I will change that. 
+
+```{r Data wrangling}
+# Creating a new column for separating the data into two groups - Students and Academics
+aarhus_survey <- aarhus_survey %>% 
+  mutate(demographic = ifelse(position == "student", "Students", "Academics"))
+
+# Subsetting the dataframe to the questions I need for visualization
+sub_survey <- aarhus_survey[,c(8,10,12,13,15,16,20,22)]
+
+# Making a list of the new names of the columns
+# Some of these names only contain the last part of the question
+# That is because the first part will be in the plot title
+colnames(sub_survey) <- c("How important is open data?", 
+                          "Share data after publication?", # Starts "is it important to" 
+                          "Share your data after publication?", # Starts "How often do you"
+                          "Share data before publication?", # Starts "is it important to"
+                          "Share your data before publication?", # Starts "How often do you"
+                          "Make your data public?", # Starts "How often do you"
+                          "Use other people\'s data?", # Starts "How often do you"
+                          "Demographic")
+
+```
+
+I will be making three different plots; One with importance rated in a likert scale, one with importance rated with a binary scale, and one with frequency rated in a likert scale. 
+
+```{r}
+#=====> Making data from the importance question the right format for plotting
+# Subsetting only the columns I need
+importance <- sub_survey[,c(1,8)]
+
+# Making the data Long format
+importance_long <- importance %>% gather(question, category, 1, factor_key=TRUE)
+
+# Summarising the data by question, category and demographic 
+importance_agg <- importance_long %>% 
+  group_by(question, category, Demographic) %>% 
+  dplyr::summarise(total = n())
+
+# Adding a column showing percentages for plotting
+importance_sum <- importance_agg %>% 
+  group_by(Demographic) %>% # Grouping by demographic...
+  mutate(countT = sum(total)) %>% # ...so the total number of answers are calculated by demographic
+  group_by(category, add=TRUE) %>% # Grouping by category...
+  mutate(per=round(100*total/countT,2)) # ..so the percenteges are calculated by category and demographic
+
+# Turning category into a factor so I can order the labels after importance for plotting 
+importance_sum$category <- as.factor(importance_sum$category)
+# Ordering the labels
+importance_sum$category <- 
+  ordered(importance_sum$category, 
+          levels = c("not important", 
+                     "slightly important",
+                     "neutral", 
+                     "important", 
+                     "very important"))
+
+
+#=====> Making data from the binary questions the right format for plotting
+# Subsetting only the columns I need
+binary <- sub_survey[,c(2,4,8)]
+
+# Making the data Long format
+binary_long <- binary %>% gather(question, category, 1:2, factor_key=TRUE)
+
+# Summarising the data by question, category and demographic 
+binary_agg <- binary_long %>% group_by(question, category, Demographic) %>% dplyr::summarise(total = n())
+
+# Adding a column showing percentages for plotting
+binary_sum <- binary_agg %>%
+  group_by(question, Demographic) %>% # Grouping by demographic and question...
+  mutate(countT= sum(total)) %>% # ...so the total number of answers are calculated by the two variables
+  group_by(category, add=TRUE) %>% # Grouping by category...
+  mutate(per=round(100*total/countT,2)) # ..so the percenteges are calculated by all three varaibles
+
+# Turning category into a factor so I can order the labels for plotting 
+binary_sum$category <- as.factor(binary_sum$category)
+# Ordering the labels
+binary_sum$category <- 
+  ordered(binary_sum$category, 
+          levels = c("no", "yes"))
+
+
+#=====> Making the data from the frequency questions the right format for plotting
+# Subsetting only the columns I need and filtering the students out of the sample
+freq <- sub_survey[,c(3,5,6,7,8)] %>% filter(Demographic == "Academics")
+
+# Making the data Long format
+freq_long <- freq %>% gather(question, category, 1:4, factor_key=TRUE)
+
+# Summarising the data by question and category
+freq_agg <- freq_long %>% group_by(question, category) %>% dplyr::summarise(total = n())
+
+# Adding a column showing percentages for plotting
+freq_sum <- freq_agg %>%
+  group_by(question) %>% # Grouping by question...
+  mutate(countT= sum(total)) %>% # ...so the total number of answers are calculated by question
+  group_by(category, add=TRUE) %>% # Grouping by category...
+  mutate(per=round(100*total/countT,2)) # ..so the percenteges are calculated by question and category
+
+# Turning category into a factor so I can order the labels after frequency for plotting
+freq_sum$category <- as.factor(freq_sum$category)
+# Ordering the labels
+freq_sum$category <- 
+  ordered(freq_sum$category, 
+          levels = c("never", "rarely", "sometimes", "often", "always"))
+
+```
+
+## Plotting 
+
+For importance 
+
+```{r, message=FALSE}
+# Creating the plot
+ggplot(data = importance_sum, aes(x =question , y = per, fill = category)) + 
+  # Making it a bar plot
+  geom_bar(stat="identity") +
+  # Applying custom color scheme
+  scale_fill_manual (values=likert_palette, 
+                     labels=levels(importance_sum$category), 
+                     drop = FALSE, 
+                     na.value = "#4F4F4F") +
+  # Flipping the bars from vertical to horizontal 
+  coord_flip() + 
+  # Removing axis titles for simplicity and adding a plot title
+  labs(x = element_blank(), y = element_blank(), title = "How important is open data?") + 
+  # Adding the custom theme
+  showcase_theme + 
+  # Removing the y axis ticks to save space
+  theme(axis.text.y = element_blank()) +
+  # Adding %-signs to the x axis
+  scale_y_continuous(labels = function(x) paste0(x, "%")) + 
+  # Changing the position of the legend 
+  guides(fill = guide_legend(nrow = 1, label.position = "top", reverse = TRUE)) + 
+  # Facetting the plot by demographic
+  facet_wrap(~Demographic) 
+
+# Saving the plot
+ggsave("output/importance_plot.jpg")
+```
+
+For binary data 
+
+```{r, message=FALSE}
+# Creating the plot
+ggplot(data = binary_sum, aes(x =question , y = per, fill = category)) + 
+  # Making it a bar plot
+  geom_bar(stat="identity") + 
+  # Applying custom color scheme
+  scale_fill_manual (values=binary_palette, 
+                     labels=levels(binary_sum$category), 
+                     drop = FALSE, 
+                     na.value = "#4F4F4F") +
+  # Flipping the bars from vertical to horizontal
+  coord_flip() +
+  # Removing axis titles for simplicity and adding a plot title
+  labs(x = element_blank(), y = element_blank(), title = "Is it important to...") +
+  # Adding the custom theme
+  showcase_theme + 
+  # Adding %-signs to the x axis
+  scale_y_continuous(labels = function(x) paste0(x, "%")) +
+  # Changing the position of the legend 
+  guides(fill = guide_legend(nrow = 1, label.position = "top", reverse = TRUE)) +
+  # Facetting the plot by demographic, and specifying the direction of the facets
+  facet_wrap(~Demographic, dir = "v")
+
+# Saving the plot
+ggsave("output/binary_plot.jpg")
+```
+
+For frequency data
+
+```{r, message=FALSE}
+# Creating the plot
+ggplot(data = freq_sum, aes(x =question , y = per, fill = category)) + 
+  # Making it a bar plot
+  geom_bar(stat="identity") +
+  # Applying custom color scheme
+  scale_fill_manual (values=likert_palette, 
+                     labels=levels(freq_sum$category), 
+                     drop = FALSE, 
+                     na.value = "#4F4F4F") +
+  # Flipping the bars from vertical to horizontal
+  coord_flip() + 
+  # Removing axis titles for simplicity and adding a plot title
+  labs(x = element_blank(), y = element_blank(), title = "How often do you...") +
+  # Adding the custom theme
+  showcase_theme + 
+  # Changing the plot's aspect ratio betweewn x and y axis and adjusting the size of the legend 
+  theme(aspect.ratio = 2/4, legend.key.width = unit(1.5, "cm")) + 
+  # Adding %-signs to the x axis
+  scale_y_continuous(labels = function(x) paste0(x, "%")) +
+  # Changing the position of the legend 
+  guides(fill = guide_legend(nrow = 1, label.position = "top", reverse = TRUE)) 
+
+# Saving the plot
+ggsave("output/frequency_plot.jpg")
+  
+```
+
+## Descriptive stats
+
+To describe my sample in the report, I will need a table of descriptive stats. This section is provided to create it, and to fish out whatever other descriptive stats are relevant. 
+
+Before presenting readers to the table, I want to rattle off the stats before I direct there reader to the table.
+
+```{r, message=FALSE}
+# Calculating the mean age of participants, rounded to 2 decimals
+round(mean(aarhus_survey$age), digits = 2)
+# > 26.94
+# Calculating the standard deviation of that mean, rounded to 2 decimals
+round(sd(aarhus_survey$age), digits = 2)
+# > 6.38
+
+# Summaraisng the dataframe to get the gender distribution
+gender <- aarhus_survey %>% group_by(gender) %>% summarise(number = n())
+# > 10 female, 7 male, 1 other
+```
+
+I want to make a table of the distribution the academic fields of the participants, but to do so I first need to group them, as these answers are in free text. 
+
+```{r, message=FALSE}
+# Looking at the nr. of unique answers to the question about participants' academic field
+unique(aarhus_survey$field)
+# > There are 10 unique answers, however, several of them are different spelling or versions of the same field. This will have to be changed. 
+
+# Making all answes lower case to remove variance between answers 
+aarhus_survey$field <- tolower(aarhus_survey$field)
+# Checking if that made my job easier 
+unique(aarhus_survey$field)
+# It did. Now there are only 8. 
+# Mashing "psychology" and "psychology and neuroscience" into one category
+aarhus_survey$field <- str_replace_all(aarhus_survey$field, 
+                                       pattern = "psychology$", 
+                                       replacement = "psychology and neuroscience")
+# Checking if that worked
+unique(aarhus_survey$field)
+# It did - now there are only 7
+# As I do not know what the answer "c" could refer to, I am changing it to NA
+is.na(aarhus_survey$field) <- aarhus_survey$field == "c"
+
+```
+
+I will be creating a table of the distribution of academic fileds using the edited list in this next section: 
+
+```{r}
+# Summarising the data according to field 
+field <- aarhus_survey %>% group_by(field) %>% summarise(number = n())
+# Printing the result
+print(field)
+```
+lastly, I want to create a table showing some descriptive stats according to the participants' position.
+
+```{r}
+# Creating summary dataframe 
+position <- aarhus_survey %>% group_by(position) %>% # grouping according to position
+  summarise(number = n(), # Getting number of answers  
+              mean_exprerience = round(mean(years_experience),2), # Getting the mean years of expreience
+              sd_expreience = round(sd(years_experience),2)) %>% # Getting the standard deviation (sd)
+  mutate(mean_exp_total = round(mean(mean_exprerience),2), # mutating a column for the total mean experience
+         sd_exp_total = round(sd(mean_exprerience),2)) # mutating a column for the sd of the total mean
+# Printing result
+print(position)
+
+```
+
+

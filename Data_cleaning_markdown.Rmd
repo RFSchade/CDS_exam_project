@@ -1,0 +1,213 @@
+---
+title: "Data Cleaning"
+author: "Rebecca Folmer Schade"
+date: "27 dec 2020"
+output: html_document
+---
+
+```{r setup, include=FALSE, echo=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+# I'll set the working directory here as well
+require("knitr")
+opts_knit$set(root.dir = "~/Uni/Cultural_data_science/Exam/Open_data_project")
+
+```
+
+The raw data (imported from Survey Xact) is difficult to work with as the labels for columns and categories are not informative. This markdown is dedicated to remedying that.  
+
+## Setup
+
+To clean the data, I will be borrowing the powers of the R package *\'tidyverse\'*, which allows easier and more flexible data manipulation (though it is not used much). 
+
+```{r Calling package, message=FALSE, warning=FALSE}
+# calling the tidyverse package
+library(tidyverse)
+```
+
+The raw data collected from the survey can be found within the *\'data\'* folder of this project.
+Its file name is *\'dataset.csv\'*, and I load it into an object (of the class *\'tibble\'*) called *\'raw_data\'* below. 
+
+```{r Loading data, message=FALSE, warning=FALSE}
+# Loading raw data
+raw_data <- read_csv("data/dataset.csv")
+```
+
+This leaves me with a data frame with 22 observations, 28 variables, and very uninformative labels.  
+
+## Removing and Renaming Columns
+
+Not all 28 variables are necessary for my analysis, so I will remove those I do not need for a better overview.  
+
+```{r Colnames}
+# Geting an overview of the columns of raw_data
+colnames(raw_data)
+```
+
+Though these names are mostly informative, I know that *\'s_1\'* refers to a declaration of consent (which in unnecessary to include as it can be inferred by completing the survey), that *\'email\'* refers to the participants' emails (which is empty as they were not collected), and that columns *\'stato_1\'* to *\'stato_5\'* refers to the completion status of the surveys (of which I will only need to keep *\'stato_4\'* to exclude incomplete forms).  
+
+Thus, I will be removing the following columns:   
+*\'s_1\' - \'email\' - \'stato_1\' - \'stato_2\' - \'stato_3\' - \'stato_5\'*
+
+```{r Removing Columns}
+# Loading the raw_data into a new object to more easily make use of the original data later on
+modified_data <- raw_data
+
+# Making a vector of the names of the columns I wish to remove
+to_remove <- c("s_1", "email", "stato_1", "stato_2", "stato_3", "stato_5")
+
+# Subsetting out the columns which names match those in to_remove
+modified_data <- modified_data[, !(names(modified_data) %in% to_remove)]
+```
+
+Now it is time to rename the remaining columns - See the READ ME file of this project for proper documentation of the new variable names. 
+
+```{r Renaming Columns}
+# Renaming the remaining columns 
+# > The remaining variables don't exactly have very informative names, so I'll change them
+colnames(modified_data) <- c("age", 
+                             "gender", 
+                             "position", 
+                             "years_experience", 
+                             "field",
+                             "familiarity",
+                             "familiarity_scource",
+                             "importance",
+                             "definition_comment",
+                             "share_after_pub",
+                             "share_after_pub_comment",
+                             "share_after_pub_freq",      
+                             "share_pre_pub",
+                             "share_pre_pub_comment",
+                             "share_pre_pub_freq",
+                             "public_data_freq",
+                             "public_data_how",
+                             "student_graded",
+                             "teacher_graded",
+                             "other_data_use",
+                             "other_data_experience",
+                             "status")
+
+```
+
+  
+
+## Changing Labels Within the Data
+
+Now that the names of the columns have become more informative, it becomes clear that labels of the categorical data within them are not. As such, I will change those as well. (for more through documentation of these labels, I once again direct you to the READ ME file)  
+
+In the survey, the questions that specifies the categorical data has text options (though these categories in the current data are represented by numbers) - I will name the labels after those. To do this, I turn the variables from characters into a factors and label the levels. 
+
+```{r Labeling Categories}
+# Labeling 'gender'
+modified_data$gender <- factor(modified_data$gender, 
+                          levels = c(1:4), 
+                          labels = c("male", 
+                                     "female",
+                                     "other", 
+                                     "prefer not to say"))
+
+# Labeling 'position'
+modified_data$position <- factor(modified_data$position,
+                            levels = c(1:4,6,7),
+                            labels = c("academic",
+                                       "archevist", 
+                                       "Independent scholar",  
+                                       "librarian",
+                                       "phd researcher", 
+                                       "student"))
+
+# Labeling 'importance'
+modified_data$importance <- factor(modified_data$importance,
+                              levels = c(0:4),
+                              labels = c("not important", 
+                                         "slightly important", 
+                                         "neutral", 
+                                         "important", 
+                                         "very important"))
+
+# Labeling 'status'
+modified_data$status <- factor(modified_data$status,
+                          levels = c(0:1),
+                          labels = c("incomplete", 
+                                     "complete"))
+
+
+# There are multiple questions where the answer key is yes/no, so I felt it would be prudent that I name them all in one go
+
+# First, I make a list of the names of the columns with the yes/no answer key
+binary <- c("familiarity", "share_after_pub", "share_pre_pub")
+# then I make a for-loop to change all the labels in one go 
+for (i in binary) {
+  # I find that in these loops it is more safe to turn the variable into a facto prior to releveling. This    is not strictly necessary, but I get less errors when I do. 
+  modified_data[[i]] <- as.factor(modified_data[[i]])
+  modified_data[[i]] <- factor(modified_data[[i]], 
+                               levels = c(2, 3), 
+                               labels = c("yes",
+                                          "no"))
+}
+
+# the questions for 'student_graded' and 'teacher_graded' also have the same answer key, so I will label these using the same method
+
+# Making a list of column names 
+grades <- c("student_graded", "teacher_graded")
+# Making a for-loop 
+for (i in grades) {
+  modified_data[[i]] <- as.factor(modified_data[[i]])
+  modified_data[[i]] <- factor(modified_data[[i]], 
+                               levels = c(2:4), 
+                               labels = c("yes", 
+                                          "no", 
+                                          "not relevant for me"))
+}
+
+# Several question about frequency also use the same answer key, so I will label these using a loop as well 
+# Making a list of column-names
+freq <- c("share_after_pub_freq", "share_pre_pub_freq", "public_data_freq", "other_data_use")
+# Making a for-loop 
+for (i in freq) {
+  modified_data[[i]] <- as.factor(modified_data[[i]])
+  modified_data[[i]] <- factor(modified_data[[i]], 
+                               levels = c(1:5), 
+                               labels = c("always", 
+                                          "often", 
+                                          "sometimes", 
+                                          "rarely", 
+                                          "never"))
+}
+
+```
+
+  
+## Work to do for later
+
+I leave the cleaning at this for now - though there are more variables that could use some cleaning - such as *\'field\'* and *\'familiarity_scource\'* - this would be for the sake of standardization (as opposed to understandability). As time is short and I will not be visualizing these variables in this class project, I feel comfortable leaving the work to be done at a later date or for another project.  
+
+## Saving the Dataset
+
+I will save this dataset two times - once as it is (somewhat cleaner than the raw data, but still containing incomplete surveys) - and once when I have removed answers from participants who did not finish the survey. 
+
+```{r}
+# Saving the data as-is
+write_csv(modified_data, "data/full_dataset.csv")
+
+# Removing data from incomplete surveys using the filter() function from tidyverse
+clean_data <- modified_data %>% filter(status == "complete")
+# This leaves 18 rows 
+
+# Removing the 'status' columns, as it is no longer needed
+clean_data$status <- NULL
+
+# Saving the clean dataset
+write_csv(clean_data, "data/clean_dataset.csv")
+```
+
+
+
+
+
+
+
+
+
+
+
