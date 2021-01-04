@@ -23,7 +23,5 @@ While visualization by itself cannot close this gap, it might aid in producing m
 
 "Datapackage_survey.json": JSON file containing the meta-data about the variables and their labels in the dataframe used visialization
 
-"Project_writeup.pdf": PDF file containing the written report of the project handed in by the exam deadline the 4th Jan. 2021 (not added yet)
-
 ## License
 [MIT](https://choosealicense.com/licenses/mit/)
